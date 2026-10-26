@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #050816;
+  --foreground: #F8FAFC;
+  --surface: #080D20;
+  --card: #0B1226;
+  --border: #252B43;
+  --accent: #7857FF;
+  --accent-light: #A78BFA;
+  --text-muted: #A6B0C3;
+}
+
+.light {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --surface: #F1F5F9;
+  --card: #FFFFFF;
+  --border: #E2E8F0;
+  --accent: #6D28D9;
+  --accent-light: #7C3AED;
+  --text-muted: #64748B;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050816;
+}
+::-webkit-scrollbar-thumb {
+  background: #252B43;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7857FF;
+}
+
+/* Violet Radial Glow Effect from Reference Image */
+.hero-glow {
+  background: radial-gradient(circle, rgba(120, 87, 255, 0.35) 0%, rgba(120, 87, 255, 0.08) 55%, transparent 70%);
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 30px -5px rgba(120, 87, 255, 0.25);
+  border-color: rgba(120, 87, 255, 0.5);
+}
+
+/* Code Snippet Card Styling */
+.code-card {
+  background: #070B19;
+  border: 1px solid #1E2640;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+}
+
+/* Dot Grid Background */
+.bg-dot-pattern {
+  background-image: radial-gradient(#252B43 1px, transparent 1px);
+  background-size: 24px 24px;
+}

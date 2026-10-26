@@ -1,0 +1,63 @@
+services:
+  # 1. FastAPI Backend Web Service
+  - type: web
+    name: portfolio-backend-api
+    runtime: python
+    region: frankfurt
+    plan: starter
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: portfolio-postgres
+          property: connectionString
+      - key: CANONICAL_SITE_URL
+        sync: false
+      - key: API_BASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PASSWORD_RESET_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: ADMIN_BOOTSTRAP_EMAIL
+        value: admin@florante.tech
+      - key: ADMIN_BOOTSTRAP_PASSWORD
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: console
+      - key: EMAIL_FROM_ADDRESS
+        value: hello@florante.tech
+
+  # 2. Next.js Frontend Web Service (Alternative to Vercel)
+  - type: web
+    name: portfolio-frontend
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false
+
+databases:
+  # Managed PostgreSQL Instance
+  - name: portfolio-postgres
+    region: frankfurt
+    plan: starter
+    databaseName: portfolio_db
+    user: portfolio_user
