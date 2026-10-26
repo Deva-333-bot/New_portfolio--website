@@ -11,19 +11,23 @@ from app.models.all_models import (
 
 def seed_initial_database(db: Session):
     """
-    Seeds initial verified content seeds according to the Master Prompt specifications.
+    Seeds a minimal starting profile and draft content; review all public content before publication.
     Ensures idempotency (does not duplicate if already initialized).
     """
     # 1. Seed Administrator User
     existing_admin = db.query(AdminUser).filter(AdminUser.email == settings.ADMIN_BOOTSTRAP_EMAIL.lower()).first()
     if not existing_admin:
-        admin = AdminUser(
-            email=settings.ADMIN_BOOTSTRAP_EMAIL.lower(),
-            password_hash=hash_password(settings.ADMIN_BOOTSTRAP_PASSWORD),
-            is_active=True
-        )
-        db.add(admin)
-        print(f"Created bootstrap administrator: {settings.ADMIN_BOOTSTRAP_EMAIL}")
+        bootstrap_password = settings.ADMIN_BOOTSTRAP_PASSWORD
+        if bootstrap_password and not bootstrap_password.startswith("REPLACE_"):
+            admin = AdminUser(
+                email=settings.ADMIN_BOOTSTRAP_EMAIL.lower(),
+                password_hash=hash_password(bootstrap_password),
+                is_active=True
+            )
+            db.add(admin)
+            print(f"Created bootstrap administrator: {settings.ADMIN_BOOTSTRAP_EMAIL}")
+        else:
+            print("Skipped bootstrap administrator: configure ADMIN_BOOTSTRAP_PASSWORD first.")
 
     # 2. Seed Profile
     existing_profile = db.query(Profile).first()
@@ -31,26 +35,22 @@ def seed_initial_database(db: Session):
         profile = Profile(
             display_name="Oduor Daivine Oluoch",
             full_name="Oduor Daivine Oluoch",
-            headline="Founder, Software Engineer & Technology Innovator",
+            headline="Software Engineering Student | AI & ML Enthusiast | Founder",
             short_bio="Building secure, intelligent software and resilient digital systems for real-world impact across Africa and beyond.",
             full_bio=(
-                "I am a software engineer, cybersecurity enthusiast, and technology founder based in Kenya. "
-                "Currently pursuing a BSc in Software Engineering at Kirinyaga University (expected 2028), "
-                "I specialize in scalable backend architectures with FastAPI, robust modern web applications, "
-                "and applied AI systems. As the founder of Florante Tech Limited, I focus on transforming complex "
-                "operational challenges into reliable, automated, and secure software platforms."
+                "I am a software engineering student, AI and machine-learning enthusiast, and technology founder based in Kenya. "
+                "I am pursuing a BSc in Software Engineering at Kirinyaga University, with expected graduation in 2028. "
+                "My current interests include Python backend development, modern web applications, and applied AI. "
+                "As founder of Florante Tech Limited, I am working toward practical software solutions for real-world problems."
             ),
-            location="Nairobi / Kirinyaga, Kenya",
+            location="Kenya",
             availability_status="Available for high-impact opportunities & partnerships",
             public_email="hello@florante.tech",
-            avatar_url="/avatar-placeholder.png",
+            avatar_url=None,
             company_name="Florante Tech Limited",
             education_summary="BSc Software Engineering, Kirinyaga University",
             expected_graduation="2028",
-            years_experience="4+",
-            projects_completed="15+",
-            happy_clients="10+",
-            client_satisfaction="100%"
+             
         )
         db.add(profile)
         print("Seeded public profile record.")
@@ -58,205 +58,107 @@ def seed_initial_database(db: Session):
     # 3. Seed Social Links
     if db.query(SocialLink).count() == 0:
         links = [
-            SocialLink(platform="GitHub", label="GitHub", url="https://github.com/florantetech", icon_name="github", display_order=1),
-            SocialLink(platform="LinkedIn", label="LinkedIn", url="https://linkedin.com/in/oduor-daivine", icon_name="linkedin", display_order=2),
-            SocialLink(platform="Twitter", label="X (Twitter)", url="https://x.com/florantetech", icon_name="twitter", display_order=3),
-            SocialLink(platform="Email", label="Email", url="mailto:hello@florante.tech", icon_name="mail", display_order=4)
+            SocialLink(platform="GitHub", label="GitHub", url="https://github.com/Deva-333-bot", icon_name="github", display_order=1),
+            SocialLink(platform="Email", label="Email", url="mailto:hello@florante.tech", icon_name="mail", display_order=2)
         ]
         db.add_all(links)
         print("Seeded social links.")
 
-    # 4. Seed Skills matching reference image design
+    # 4. Seed skills from the developer's stated technical skills.
+    # Do not display numeric proficiency scores without a defined assessment.
     if db.query(Skill).count() == 0:
         skills = [
-            # Column 1
-            Skill(name="HTML5", category="Frontend", proficiency_label="Advanced", proficiency_value=95, icon_name="html5", display_order=1),
-            Skill(name="CSS3", category="Frontend", proficiency_label="Advanced", proficiency_value=90, icon_name="css3", display_order=2),
-            Skill(name="JavaScript", category="Languages", proficiency_label="Advanced", proficiency_value=90, icon_name="javascript", display_order=3),
-            # Column 2
-            Skill(name="React.js", category="Frontend", proficiency_label="Proficient", proficiency_value=85, icon_name="react", display_order=4),
-            Skill(name="Next.js", category="Frontend", proficiency_label="Proficient", proficiency_value=80, icon_name="nextjs", display_order=5),
-            Skill(name="TypeScript", category="Languages", proficiency_label="Proficient", proficiency_value=85, icon_name="typescript", display_order=6),
-            # Column 3
-            Skill(name="Python & FastAPI", category="Backend", proficiency_label="Advanced", proficiency_value=92, icon_name="python", display_order=7),
-            Skill(name="Tailwind CSS", category="Frontend", proficiency_label="Advanced", proficiency_value=90, icon_name="tailwindcss", display_order=8),
-            Skill(name="Git & GitHub", category="Tools", proficiency_label="Proficient", proficiency_value=85, icon_name="git", display_order=9),
-            # Supplementary technical capabilities
-            Skill(name="PostgreSQL & SQLAlchemy", category="Databases", proficiency_label="Advanced", proficiency_value=88, icon_name="database", display_order=10),
-            Skill(name="Docker & Containers", category="DevOps", proficiency_label="Developing", proficiency_value=75, icon_name="container", display_order=11),
-            Skill(name="Cybersecurity & OWASP", category="Security", proficiency_label="Proficient", proficiency_value=82, icon_name="shield", display_order=12),
+            Skill(name="Python", category="Languages", icon_name="python", display_order=1),
+            Skill(name="JavaScript", category="Languages", icon_name="javascript", display_order=2),
+            Skill(name="React", category="Frontend", icon_name="react", display_order=3),
+            Skill(name="FastAPI", category="Backend", icon_name="fastapi", display_order=4),
+            Skill(name="Django", category="Backend", icon_name="django", display_order=5),
+            Skill(name="PostgreSQL", category="Databases", icon_name="database", display_order=6),
+            Skill(name="Git & GitHub", category="Tools", icon_name="git", display_order=7),
+            Skill(name="Java", category="Languages", icon_name="java", display_order=8),
         ]
         db.add_all(skills)
-        print("Seeded technology skills.")
+        print("Seeded developer skills without unverified proficiency scores.")
 
-    # 5. Seed Initial Projects (6 projects from Master Prompt)
+    # 5. Seed a small set of known projects with restrained descriptions.
+    # External URLs and performance claims are omitted until verified.
     if db.query(Project).count() == 0:
         projects = [
             Project(
-                title="TechRica Learn Hub",
-                slug="techrica-learn-hub",
-                summary="Full-stack interactive e-learning platform with role-based access, progress metrics, and AI assistant integration.",
+                title="Personal Portfolio & CMS",
+                slug="personal-portfolio-cms",
+                summary="A full-stack portfolio website with a content-management dashboard.",
                 description=(
-                    "An educational hub engineered to empower African learners with modern technical curriculums. "
-                    "Features dynamic course enrollment, module quizzes, progress tracking, and intelligent study aids."
+                    "A portfolio application built with a Next.js frontend and a FastAPI backend. "
+                    "The project includes public profile and project pages alongside administrator content-management features."
                 ),
                 category="Full Stack",
-                problem_statement="Learners in developing regions face fragmented educational resources and lack automated, guided tracking.",
-                solution="Architected a unified e-learning portal with role-based JWT authentication, modular content streams, and quiz evaluation engines.",
-                architecture="React frontend with Tailwind CSS consuming a high-throughput Python FastAPI REST service backed by PostgreSQL.",
-                implementation_details="Implemented relational enrollment models, asynchronous quiz grading, and JWT authentication with role authorization.",
-                challenges="Optimizing API latency during peak quiz concurrency and designing resilient offline-ready study materials.",
-                outcomes="Successfully onboarded initial test cohort; sub-100ms API response latency on standard endpoints.",
+                problem_statement="Presenting software projects and professional information in one maintainable website.",
+                solution="Building a public portfolio with an administrative interface for managing content.",
+                architecture="Next.js frontend, FastAPI API, SQLAlchemy data models, and a relational database.",
+                implementation_details="Includes profile, project, skills, blog, contact, and administrator workflows.",
+                challenges="Keeping public content, administrative workflows, and deployment configuration maintainable.",
+                outcomes="The project is being tested and refined; deployment and feature status should be verified before making production claims.",
                 status="In progress",
                 visibility="Published",
                 featured=True,
-                cover_image_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
-                live_url="https://techrica.florante.tech",
-                repository_url="https://github.com/florantetech/techrica-learn-hub",
-                technologies_csv="React, Next.js, FastAPI, PostgreSQL, Tailwind CSS",
+                technologies_csv="Next.js, React, TypeScript, Python, FastAPI, SQLAlchemy, PostgreSQL",
                 display_order=1,
                 published_at=datetime.now(timezone.utc),
-                seo_title="TechRica Learn Hub - Full-Stack E-Learning Architecture",
-                seo_description="Case study on TechRica Learn Hub built with React, FastAPI, and PostgreSQL."
+                seo_title="Personal Portfolio and CMS",
+                seo_description="A full-stack developer portfolio and content-management application."
             ),
             Project(
-                title="FastAPI Task Management Application",
-                slug="fastapi-task-manager",
-                summary="Production-ready workflow and task orchestration service featuring SQLAlchemy 2.0 and automated scheduling.",
+                title="Hotel Management System",
+                slug="hotel-management-system",
+                summary="A prototype exploring hotel-management workflows with a React frontend and FastAPI backend.",
                 description=(
-                    "A high-performance backend task management microservice providing priority scheduling, "
-                    "status transitions, and comprehensive audit trails."
+                    "A software engineering prototype focused on organizing hotel-management workflows "
+                    "through a web interface and API."
                 ),
-                category="Backend",
-                problem_statement="Need for an unbloated, type-safe task coordination API with deterministic transaction isolation and clean OpenAPI docs.",
-                solution="Built using FastAPI's dependency injection system, Pydantic v2 validation, and SQLAlchemy's async/sync query planner.",
-                architecture="Layered repository pattern separating domain models from HTTP delivery, backed by PostgreSQL indexes.",
-                implementation_details="Includes Argon2 password hashing, rate limiting, and structured JSON logs.",
-                challenges="Handling database connection pooling under burst traffic and ensuring zero deadlocks during concurrent status updates.",
-                outcomes="100% test coverage across critical business endpoints with complete automated CI pipeline.",
-                status="Completed",
-                visibility="Published",
-                featured=True,
-                cover_image_url="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80",
-                live_url="https://tasks.florante.tech",
-                repository_url="https://github.com/florantetech/fastapi-task-manager",
-                technologies_csv="FastAPI, PostgreSQL, SQLAlchemy, Docker, Pytest",
-                display_order=2,
-                published_at=datetime.now(timezone.utc),
-                seo_title="FastAPI Task Management Engine - Architectural Case Study",
-                seo_description="Production task management microservice built with Python, FastAPI, and PostgreSQL."
-            ),
-            Project(
-                title="Loan Prediction & Risk Intelligence",
-                slug="loan-prediction-ml",
-                summary="Machine learning exploratory pipeline analyzing credit applicant parameters to predict approval probabilities.",
-                description=(
-                    "A data science and machine learning research project evaluating applicant creditworthiness, "
-                    "identifying high-risk variables, and generating explanatory metrics."
-                ),
-                category="AI / Machine Learning",
-                problem_statement="Manual loan underwriting is slow, subjective, and prone to biased evaluation.",
-                solution="Engineered data preprocessing and classification pipelines comparing logistic regression, random forests, and gradient boosting.",
-                architecture="Scikit-learn pipeline containerized with FastAPI serving REST prediction endpoints.",
-                implementation_details="Feature engineering on applicant income, co-applicant income, credit history, and loan term.",
-                challenges="Managing imbalanced target classes and ensuring model explainability without black-box bias.",
-                outcomes="Achieved ~81% ROC-AUC score on benchmark validation dataset.",
+                category="Full Stack",
+                problem_statement="Hotel operations can require a central place to organize common management workflows.",
+                solution="Exploring a web application architecture using React and FastAPI.",
+                architecture="React frontend with a FastAPI backend.",
+                implementation_details="Prototype built to explore full-stack application structure and API integration.",
+                challenges="Refining requirements and validating the workflow before describing it as production-ready.",
+                outcomes="Prototype project; functionality and deployment details should be confirmed before publication of further claims.",
                 status="Prototype",
                 visibility="Published",
                 featured=True,
-                cover_image_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-                live_url=None,
-                repository_url="https://github.com/florantetech/loan-prediction-ml",
-                technologies_csv="Python, Scikit-Learn, Pandas, FastAPI, NumPy",
+                technologies_csv="React, FastAPI, Python",
+                display_order=2,
+                published_at=datetime.now(timezone.utc),
+                seo_title="Hotel Management System Prototype",
+                seo_description="A React and FastAPI prototype exploring hotel-management workflows."
+            ),
+            Project(
+                title="Sales Forecasting",
+                slug="sales-forecasting",
+                summary="A machine-learning project exploring sales forecasting with Python and TensorFlow.",
+                description=(
+                    "A data-science project focused on exploring forecasting methods for sales data "
+                    "and learning how to evaluate predictive models."
+                ),
+                category="AI / Machine Learning",
+                problem_statement="Understanding patterns in historical sales data can help inform future planning.",
+                solution="Exploring a Python-based forecasting workflow using machine-learning tools.",
+                architecture="Python data-processing and model-training workflow.",
+                implementation_details="Uses Python and TensorFlow as part of the forecasting project.",
+                challenges="Data preparation, model selection, and validation of forecasting results.",
+                outcomes="Exploratory project; no numerical accuracy or business-impact claim is made without reproducible evaluation.",
+                status="Prototype",
+                visibility="Published",
+                featured=True,
+                technologies_csv="Python, TensorFlow, Machine Learning",
                 display_order=3,
                 published_at=datetime.now(timezone.utc),
-                seo_title="Loan Prediction ML Architecture & Risk Analysis",
-                seo_description="Credit risk predictive pipeline exploring applicant metrics and machine learning classifications."
+                seo_title="Sales Forecasting Machine Learning Project",
+                seo_description="An exploratory sales forecasting project using Python and TensorFlow."
             ),
-            Project(
-                title="Election Technology Solutions",
-                slug="election-technology-solutions",
-                summary="Research and prototype initiative exploring tamper-evident digital election audit trails and voter transparency.",
-                description=(
-                    "An ongoing architectural exploration into cryptographic tallying, decentralized verification protocols, "
-                    "and secure voter authentication models suited for low-bandwidth environments."
-                ),
-                category="Cybersecurity & Systems",
-                problem_statement="Public trust in electoral technology requires verifiable transparency rather than proprietary opacity.",
-                solution="Prototyping append-only cryptographic log models (Merkle trees) for auditable vote verification.",
-                architecture="Zero-knowledge receipt validation concepts paired with high-availability local consensus nodes.",
-                implementation_details="Exploring cryptographic proof-of-inclusion algorithms in Python.",
-                challenges="Balancing ballot secrecy (privacy) with end-to-end mathematical verifiability.",
-                outcomes="Authored technical architecture whitepaper and demonstrated local proof-of-concept verification script.",
-                status="Concept",
-                visibility="Published",
-                featured=False,
-                cover_image_url="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=800&q=80",
-                live_url=None,
-                repository_url="https://github.com/florantetech/election-tech-research",
-                technologies_csv="Python, Cryptography, Distributed Systems, Security",
-                display_order=4,
-                published_at=datetime.now(timezone.utc),
-                seo_title="Election Technology Transparency Research",
-                seo_description="Cryptographic verifiability models for transparent and tamper-evident election systems."
-            ),
-            Project(
-                title="Florante Tech Limited Platform",
-                slug="florante-tech-platform",
-                summary="Corporate digital infrastructure, service automation, and client technology incubation engine.",
-                description=(
-                    "The operational backbone for Florante Tech Limited, powering automated service provisioning, "
-                    "software delivery pipelines, and enterprise technology consulting."
-                ),
-                category="Enterprise & Cloud",
-                problem_statement="Managing distributed software ventures requires integrated deployment, billing, and monitoring.",
-                solution="Established unified infrastructure templates with automated container deployment and telemetry.",
-                architecture="Next.js edge frontends backed by Python APIs and containerized cloud services.",
-                implementation_details="Integrated automated health probing and uptime alert gateways.",
-                challenges="Maintaining lean operational overhead while ensuring 99.9% service availability.",
-                outcomes="Serves as the foundational incubator for all Florante Tech commercial software initiatives.",
-                status="Completed",
-                visibility="Published",
-                featured=False,
-                cover_image_url="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
-                live_url="https://florante.tech",
-                repository_url=None,
-                technologies_csv="Next.js, FastAPI, Cloud Infrastructure, Docker",
-                display_order=5,
-                published_at=datetime.now(timezone.utc),
-                seo_title="Florante Tech Limited Corporate Platform",
-                seo_description="Digital systems architecture for Florante Tech Limited."
-            ),
-            Project(
-                title="Django Authentication & Learning Engine",
-                slug="django-auth-learning-project",
-                summary="Backend authentication and user permission architecture built with Django and PostgreSQL.",
-                description=(
-                    "A comprehensive exploration of Django's session engine, template security, CSRF protection, "
-                    "and relational database schemas."
-                ),
-                category="Backend",
-                problem_statement="Gaining in-depth mastery of enterprise session handling and ORM query optimization.",
-                solution="Implemented custom user models, password hashing workflows, and role-based template views.",
-                architecture="Monolithic Django application utilizing SQLite for local testing and PostgreSQL for deployment.",
-                implementation_details="Custom middleware for session expiry and rate-limiting authentication attempts.",
-                challenges="Preventing N+1 queries in nested template tags through `select_related` and `prefetch_related`.",
-                outcomes="Established robust understanding of server-rendered web security foundations.",
-                status="Completed",
-                visibility="Published",
-                featured=False,
-                cover_image_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
-                live_url=None,
-                repository_url="https://github.com/florantetech/django-auth-learning",
-                technologies_csv="Python, Django, PostgreSQL, HTML5, CSS3",
-                display_order=6,
-                published_at=datetime.now(timezone.utc),
-                seo_title="Django Authentication & Security Learning Architecture",
-                seo_description="Deep-dive backend learning project covering Django authentication and ORM tuning."
-            )
         ]
         db.add_all(projects)
-        print("Seeded 6 verified portfolio projects.")
+        print("Seeded three project descriptions without unverified URLs or metrics.")
 
     # 6. Seed Sample Articles
     if db.query(BlogPost).count() == 0:
@@ -277,8 +179,8 @@ def seed_initial_database(db: Session):
                 tags="FastAPI, Python, SQLAlchemy, Architecture",
                 author_name="Oduor Daivine Oluoch",
                 reading_time_minutes=4,
-                status="Published",
-                published_at=datetime.now(timezone.utc),
+                status="Draft",
+                published_at=None,
                 seo_title="Building Production APIs with FastAPI and SQLAlchemy 2.0",
                 seo_description="Best practices for structuring scalable, production-ready Python backend services."
             ),
@@ -298,8 +200,8 @@ def seed_initial_database(db: Session):
                 tags="Cybersecurity, OWASP, AppSec, Next.js",
                 author_name="Oduor Daivine Oluoch",
                 reading_time_minutes=6,
-                status="Published",
-                published_at=datetime.now(timezone.utc),
+                status="Draft",
+                published_at=None,
                 seo_title="Full-Stack Web Application Security - OWASP Countermeasures",
                 seo_description="Practical architectural guide to securing modern web applications against common vulnerabilities."
             )
@@ -307,60 +209,9 @@ def seed_initial_database(db: Session):
         db.add_all(posts)
         print("Seeded technical blog articles.")
 
-    # 7. Seed Testimonials (1 authentic-looking placeholder from reference visual, marked approved for preview)
-    if db.query(Testimonial).count() == 0:
-        testimonials = [
-            Testimonial(
-                author_name="Sarah Johnson",
-                author_role="CEO",
-                organization="TechStart",
-                content="Alex is an exceptional developer who delivers high-quality work on time. His attention to detail and problem-solving skills are outstanding.",
-                image_url="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
-                permission_confirmed=True,
-                approved=True,
-                is_visible=True,
-                display_order=1
-            )
-        ]
-        db.add_all(testimonials)
-        print("Seeded testimonial.")
+    
 
-    # 8. Seed Dummy CV Document so the download works immediately
-    if db.query(CVDocument).count() == 0:
-        cv_dir = os.path.join(settings.LOCAL_STORAGE_DIR, "cv")
-        os.makedirs(cv_dir, exist_ok=True)
-        cv_file = os.path.join(cv_dir, "oduor_daivine_cv.pdf")
-        if not os.path.exists(cv_file):
-            # Create a simple valid PDF header
-            with open(cv_file, "wb") as f:
-                f.write(b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000108 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n193\n%%EOF")
-        cv = CVDocument(
-            file_path=cv_file,
-            public_filename="Oduor_Daivine_Oluoch_CV.pdf",
-            is_published=True,
-            version="1.0"
-        )
-        db.add(cv)
-        print("Seeded CV document record.")
-
-    # 9. Seed Site Settings
-    if db.query(SiteSetting).count() == 0:
-        site_settings = [
-            SiteSetting(key="general", value_json=json.dumps({
-                "site_title": "Oduor Daivine Oluoch | Founder & Software Engineer",
-                "tagline": "Building Secure, Intelligent Software for Real-World Problems",
-                "default_theme": "dark",
-                "analytics_consent_required": True
-            })),
-            SiteSetting(key="seo", value_json=json.dumps({
-                "meta_description": "Official portfolio of Oduor Daivine Oluoch - Founder of Florante Tech Limited, Software Engineer, and Technology Innovator.",
-                "keywords": "Software Engineer, Kenya, FastAPI, React, Full Stack, Florante Tech, Cybersecurity",
-                "og_image": "/og-cover.png",
-                "robots_directive": "index, follow"
-            }))
-        ]
-        db.add_all(site_settings)
-        print("Seeded site settings.")
+    
 
     db.commit()
     print("Database seeding completed successfully!")

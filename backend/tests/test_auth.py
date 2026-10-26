@@ -7,10 +7,12 @@ def test_login_success(client):
     })
     assert response.status_code == 200
     data = response.json()
-    assert "token" in data
+    assert "token" not in data
     assert data["user"]["email"] == settings.ADMIN_BOOTSTRAP_EMAIL.lower()
     # Check HttpOnly cookie was set
     assert "portfolio_session" in response.cookies
+    assert response.cookies.get("portfolio_session")
+    assert "httponly" in response.headers.get("set-cookie", "").lower()
 
 def test_login_invalid_password(client):
     response = client.post("/api/v1/auth/login", json={
@@ -60,8 +62,7 @@ def test_password_change(client, auth_headers):
     assert succ_resp.status_code == 200
 
     # Reset back to bootstrap password for other tests
-    new_token = succ_resp.json()["token"]
-    client.post("/api/v1/auth/password/change", headers={"Authorization": f"Bearer {new_token}"}, json={
+    client.post("/api/v1/auth/password/change", json={
         "current_password": new_pass,
         "new_password": settings.ADMIN_BOOTSTRAP_PASSWORD
     })

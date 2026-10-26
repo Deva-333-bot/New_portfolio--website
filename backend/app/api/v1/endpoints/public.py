@@ -1,6 +1,7 @@
 import os
 import uuid
 import hashlib
+import hmac
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -24,6 +25,13 @@ from app.schemas.all_schemas import (
 from app.services.email_service import send_notification_email
 
 router = APIRouter(prefix="/public", tags=["Public Content"])
+
+
+def daily_pseudonymous_reference(client_ip: str, now: datetime | None = None) -> str:
+    day = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%d")
+    key = (settings.SESSION_SECRET or "local-development-only").encode("utf-8")
+    digest = hmac.new(key, f"{client_ip}:{day}".encode("utf-8"), hashlib.sha256).hexdigest()
+    return digest[:16]
 
 @router.get("/profile")
 def get_public_profile(db: Session = Depends(get_db)):
@@ -200,6 +208,12 @@ def submit_contact_form(
             reference_id=uuid.uuid4()
         )
 
+    if not req.consent:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please confirm consent before submitting the contact form."
+        )
+
     # Save contact message
     msg = ContactMessage(
         name=req.name.strip(),
@@ -231,17 +245,6 @@ def submit_contact_form(
     db.add(lead)
     db.commit()
 
-    # Record analytics event
-    event = AnalyticsEvent(
-        event_name="contact_form_submit",
-        page_path="/contact",
-        content_type="lead",
-        content_id=str(lead.id),
-        session_reference=hashlib.sha256(f"{client_ip}:{datetime.now().strftime('%Y-%m-%d')}".encode()).hexdigest()[:16]
-    )
-    db.add(event)
-    db.commit()
-
     # Send email notification to site owner
     send_notification_email(
         subject=f"New Lead / Inquiry: {msg.subject} ({msg.name})",
@@ -258,7 +261,7 @@ def submit_contact_form(
 
     return ContactSubmitResponse(
         success=True,
-        message="Thank you! Your message has been sent successfully. I will get back to you shortly.",
+        message="Thank you! Your inquiry has been received.",
         reference_id=msg.id
     )
 
@@ -271,11 +274,11 @@ def record_analytics_event(
     client_ip = get_client_ip(request)
     rate_limiter.check_rate_limit(client_ip, settings.RATE_LIMIT_ANALYTICS_PER_MINUTE)
 
-    # Privacy-conscious daily pseudonymized session reference
-    session_ref = req.session_reference
-    if not session_ref:
-        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        session_ref = hashlib.sha256(f"{client_ip}:{today_str}".encode()).hexdigest()[:16]
+    if req.consent_state != "granted":
+        return {"status": "ignored", "reason": "analytics consent not granted"}
+
+    # Ignore client-supplied identifiers; generate a server-keyed daily pseudonymous reference.
+    session_ref = daily_pseudonymous_reference(client_ip)
 
     event = AnalyticsEvent(
         event_name=req.event_name,

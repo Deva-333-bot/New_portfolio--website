@@ -105,7 +105,7 @@ export default function AdminTestimonialsManager() {
               required
               value={newTestimonial.author_name}
               onChange={(e) => setNewTestimonial({ ...newTestimonial, author_name: e.target.value })}
-              placeholder="e.g. Sarah Johnson"
+              placeholder="Client name"
               className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-navy-600 text-white text-xs"
             />
           </div>
@@ -131,7 +131,7 @@ export default function AdminTestimonialsManager() {
               type="text"
               value={newTestimonial.organization}
               onChange={(e) => setNewTestimonial({ ...newTestimonial, organization: e.target.value })}
-              placeholder="e.g. TechStart"
+              placeholder="Organization (optional)"
               className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-navy-600 text-white text-xs"
             />
           </div>

@@ -71,13 +71,14 @@ def login(
     db.refresh(session_rec)
 
     # Set secure HttpOnly cookie
-    is_prod = settings.APP_ENV == "production"
+    is_prod = settings.APP_ENV.lower() == "production"
     response.set_cookie(
         key="portfolio_session",
         value=raw_token,
         httponly=True,
         secure=is_prod,
-        samesite="lax",
+        # Cross-origin frontend/API deployments need SameSite=None with Secure.
+        samesite="none" if is_prod else "lax",
         max_age=duration_hours * 3600,
         path="/"
     )
@@ -90,8 +91,6 @@ def login(
     )
 
     return LoginResponse(
-        token=raw_token,
-        token_type="Bearer",
         expires_at=expires_at,
         user=UserResponse.model_validate(user)
     )
@@ -116,7 +115,13 @@ def logout(
         })
         db.commit()
 
-    response.delete_cookie(key="portfolio_session", path="/")
+    response.delete_cookie(
+        key="portfolio_session",
+        path="/",
+        httponly=True,
+        secure=settings.APP_ENV.lower() == "production",
+        samesite="none" if settings.APP_ENV.lower() == "production" else "lax",
+    )
     log_audit_event(
         db, action="auth.logout",
         admin_user_id=admin.id,
@@ -154,21 +159,27 @@ def change_password(
 @router.post("/password/forgot")
 def forgot_password(
     req: PasswordForgotRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    client_ip = get_client_ip(request)
+    rate_limiter.check_rate_limit(client_ip, settings.RATE_LIMIT_LOGIN_PER_MINUTE)
     user = db.query(AdminUser).filter(AdminUser.email == req.email.lower()).first()
     if user:
-        reset_token = generate_reset_token(user.email)
-        reset_url = f"{settings.CANONICAL_SITE_URL}/admin/reset-password?token={reset_token}"
-        send_notification_email(
-            subject="Password Reset Request - Portfolio CMS",
-            body_text=f"A password reset was requested for your administrator account.\n\nClick the link below to reset your password (valid for 1 hour):\n{reset_url}\n\nIf you did not request this, please ignore this email.",
-            to_address=user.email
-        )
+        # Never print password-reset links into production logs through console email.
+        console_only = settings.EMAIL_PROVIDER.lower() == "console" or not settings.SMTP_HOST
+        if not (settings.APP_ENV.lower() == "production" and console_only):
+            reset_token = generate_reset_token(user.email, user.updated_at)
+            reset_url = f"{settings.CANONICAL_SITE_URL.rstrip('/')}/admin/reset-password?token={reset_token}"
+            send_notification_email(
+                subject="Password Reset Request - Portfolio CMS",
+                body_text=f"A password reset was requested for your administrator account.\\n\\nClick the link below to reset your password (valid for 1 hour):\\n{reset_url}\\n\\nIf you did not request this, please ignore this email.",
+                to_address=user.email
+            )
         log_audit_event(db, action="auth.password_reset_requested", metadata={"email": user.email})
 
     # Return identical generic response to prevent user enumeration
-    return {"message": "If this email is registered, a password reset link has been dispatched."}
+    return {"message": "If this email is registered and email delivery is configured, reset instructions will be sent."}
 
 @router.post("/password/reset")
 def reset_password(
@@ -183,8 +194,11 @@ def reset_password(
         )
 
     user = db.query(AdminUser).filter(AdminUser.email == email.lower()).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    if not user or verify_reset_token(req.token, user.updated_at) is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Reset token is invalid, has expired, or has already been used."
+        )
 
     user.password_hash = hash_password(req.new_password)
     user.updated_at = datetime.now(timezone.utc)

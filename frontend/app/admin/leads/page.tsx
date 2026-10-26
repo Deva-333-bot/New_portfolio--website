@@ -74,16 +74,14 @@ export default function AdminLeadsManager() {
   };
 
   const handleExportCsv = () => {
-    const token = localStorage.getItem("portfolio_admin_token");
     const exportUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1"}/admin/leads-export/csv`;
-    
-    // Trigger download
-    fetch(exportUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.blob())
+
+    // Use the HttpOnly session cookie instead of a JavaScript-readable token.
+    fetch(exportUrl, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Export failed (${res.status})`);
+        return res.blob();
+      })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -92,6 +90,7 @@ export default function AdminLeadsManager() {
         document.body.appendChild(a);
         a.click();
         a.remove();
+        window.URL.revokeObjectURL(url);
       })
       .catch((err) => alert("Export failed: " + err.message));
   };

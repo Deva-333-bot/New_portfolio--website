@@ -6,10 +6,9 @@ import { getAdminSettings, updateAdminSetting } from "../../../lib/api";
 
 export default function AdminSettingsManager() {
   const [generalSettings, setGeneralSettings] = useState({
-    site_title: "Oduor Daivine Oluoch | Founder & Software Engineer",
+    site_title: "Oduor Daivine Oluoch | Software Engineering Student & Founder",
     tagline: "Building Secure, Intelligent Software for Real-World Problems",
     default_theme: "dark",
-    analytics_consent_required: true,
   });
   const [status, setStatus] = useState<string | null>(null);
 
@@ -44,7 +43,7 @@ export default function AdminSettingsManager() {
           Site Preferences & Operational Configuration
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Configure site-wide defaults, themes, and visitor privacy policies.
+          Configure site-wide title, tagline, and theme preferences.
         </p>
       </div>
 
@@ -97,18 +96,7 @@ export default function AdminSettingsManager() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              id="consent-cfg"
-              checked={generalSettings.analytics_consent_required}
-              onChange={(e) => setGeneralSettings({ ...generalSettings, analytics_consent_required: e.target.checked })}
-              className="rounded bg-navy-900 border-navy-600 text-brand-600 focus:ring-brand-500"
-            />
-            <label htmlFor="consent-cfg" className="text-xs text-slate-300">
-              Enforce KDPA Privacy Notice for First-Party Analytics
-            </label>
-          </div>
+
         </div>
 
         <button

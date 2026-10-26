@@ -31,11 +31,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // If on login page, render children directly without sidebar
-  const isLoginPage = pathname === "/admin/login";
+  // Authentication and password-recovery pages are public and render without the admin shell.
+  const isPublicAuthPage = [
+    "/admin/login",
+    "/admin/forgot-password",
+    "/admin/reset-password",
+  ].includes(pathname);
 
   useEffect(() => {
-    if (isLoginPage) {
+    if (isPublicAuthPage) {
       setLoading(false);
       return;
     }
@@ -48,17 +52,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => {
         router.push("/admin/login");
       });
-  }, [pathname, isLoginPage, router]);
+  }, [pathname, isPublicAuthPage, router]);
 
   const handleLogout = async () => {
     try {
       await adminLogout();
     } catch {}
-    localStorage.removeItem("portfolio_admin_token");
     router.push("/admin/login");
   };
 
-  if (isLoginPage) {
+  if (isPublicAuthPage) {
     return <>{children}</>;
   }
 

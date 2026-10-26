@@ -57,7 +57,8 @@ def test_admin_contact_messages_and_leads(client, auth_headers):
         "email": "grace@navy.mil",
         "subject": "Compiler Optimization",
         "message": "Let us talk about optimizing compilers and high performance routines.",
-        "inquiry_type": "Consulting"
+        "inquiry_type": "Consulting",
+        "consent": True
     })
 
     # Retrieve in admin

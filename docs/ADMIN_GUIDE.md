@@ -8,7 +8,7 @@ This guide documents the administrative capabilities of the personal portfolio a
 
 - **Portal URL**: `/admin/login`
 - **Authentication**: Single-administrator account protected with **Argon2id** password hashing.
-- **Session Architecture**: Upon successful sign-in, an opaque, cryptographically secure 48-byte token is issued and set as a secure, `HttpOnly`, `SameSite=Lax` cookie (`portfolio_session`). The database stores only a SHA-256 hash of the token.
+- **Session Architecture**: Upon successful sign-in, an opaque session token is set only in an `HttpOnly` cookie (`portfolio_session`); the login response does not expose it to JavaScript. Production cookies use `Secure` and `SameSite=None` for cross-origin frontend/API deployments. State-changing authenticated requests validate any included `Origin` against configured frontend origins. The database stores only a keyed SHA-256 hash of the token.
 - **Rate Limiting**: Brute-force login attempts are rate-limited to 10-20 requests per minute per IP address.
 - **Audit Logging**: Every login attempt, content change, lead status update, and CV replacement is permanently recorded in the immutable `audit_logs` table.
 
@@ -71,7 +71,7 @@ Manage genuine case studies and showcase technical depth:
 
 - Add new languages, frameworks, databases, and DevOps tools.
 - Group by categories: *Languages*, *Frontend*, *Backend*, *Databases*, *AI / ML*, *DevOps*, *Security*, *Tools*.
-- Set visual proficiency percentages (0-100%) and descriptive labels (*Beginner*, *Developing*, *Proficient*, *Advanced*).
+- Use descriptive proficiency labels if useful. Numeric percentages are optional and should only be used when they represent a meaningful, defensible assessment; the public site currently does not render numeric progress bars.
 
 ---
 

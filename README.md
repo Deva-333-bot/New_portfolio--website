@@ -1,146 +1,169 @@
-# Production-Grade Personal Portfolio Platform & Admin CMS
+# Personal Portfolio Website & Admin CMS
 
-[![CI Pipeline](https://github.com/florantetech/portfolio-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/florantetech/portfolio-platform/actions/workflows/ci.yml)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg?style=flat&logo=next.js&logoColor=white)](https://nextjs.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+A full-stack portfolio application for Oduor Daivine Oluoch, software engineering student, AI/ML enthusiast, and founder of Florante Tech Limited. The project combines a Next.js frontend with a FastAPI API, SQLAlchemy models, and a relational database.
 
-A complete, production-grade personal technology portfolio and administrative content management system engineered for **Oduor Daivine Oluoch** (Founder, Software Engineer & Technology Innovator at **Florante Tech Limited**).
+## Technology stack
 
-Inspired directly by modern developer portfolio visual designs: deep interstellar `#050816` dark aesthetic, vibrant `#7857FF` violet gradients, interactive floating code snippet card, real visitor business intelligence, lead pipeline triage, and persistent PostgreSQL storage.
+- **Frontend:** Next.js App Router, React, TypeScript, Tailwind CSS
+- **Backend:** Python, FastAPI, Pydantic, SQLAlchemy
+- **Database:** PostgreSQL in deployment; SQLite can be used locally
+- **Security:** Argon2id password hashing, server-side sessions, HttpOnly cookies, origin checks for state-changing authenticated requests
+- **Operations:** Docker Compose, Render blueprint, GitHub Actions CI
 
----
+## Features
 
-## Key Architecture & Capabilities
+### Public website
+- Hero, biography, skills, project cards and project details
+- Education, internship, and project timeline
+- Blog pages (starter articles remain drafts until reviewed and published)
+- Contact form that stores inquiries and creates a lead record
+- Privacy notice and opt-in first-party analytics (visitors can accept or decline)
+- CV download endpoint that only serves a published CV record
 
-### 1. Public Portfolio Experience
-- **Hero Section**: Two-column layout matching reference design with developer greeting, verified technology badges, circular radial violet glow, floating interactive code snippet card, primary *"View My Work"* CTA, and secondary *"Download CV"* button.
-- **About Me**: Professional biography, founder vision, Kirinyaga University BSc Software Engineering credentials (expected 2028), and 4 honest highlight metric cards (Years Experience, Projects Completed, Clients, Satisfaction).
-- **Skills Grid**: 3-column layout featuring categorized skills with custom violet progress bars and proficiency percentages.
-- **Featured Projects**: 3-card showcase with card index numbers (`01`, `02`, `03`), cover images, status badges, tech pills, and an interactive **Deep-Dive Case Study Drawer** (Problem, Solution, Architecture, Outcomes, Live Demo, and GitHub links).
-- **Trajectory Timeline**: Academic milestones, founder initiatives at Florante Tech Limited, and software engineering experience.
-- **Technical Writing / Blog**: Engineering articles with reading times, tag pills, and dedicated reading pages.
-- **Testimonials**: Authentic reviews rendered only upon administrative approval.
-- **Contact & Hiring Conversion**: Inquiry form with honeypot bot protection, budget/timeline parameters, submission confirmation, email alerts, and automatic lead creation.
-- **Footer**: 3-column footer with quick consultation CTA, testimonial quote card, social links, and copyright bar.
-- **Dark & Light Mode**: Defaulting to the reference visual dark developer theme with seamless toggle and persisted preference.
+### Administrator CMS
+- Profile and social-link management
+- Project and skill management
+- Blog publishing workflow
+- Testimonial approval and visibility controls
+- CV and media upload management
+- Contact inbox, lead pipeline, CSV export, analytics, settings, GitHub integration, and audit logs
 
-### 2. Full Admin CMS & Business Intelligence (`/admin`)
-- **Single-Administrator Security**: Protected with **Argon2id** password hashing and **opaque server-validated sessions** (storing only SHA-256 hashes in `admin_sessions`).
-- **Real-Time BI Dashboard**: Interactive Recharts analytics tracking Page Views over time, Unique Visitors, CV Downloads, Contact Inquiries, Conversion Funnel, Top Visited Pages, and Top Projects.
-- **Profile Manager**: Live updating of headlines, bios, education, stats, and social links without code edits.
-- **Project Manager**: Complete CRUD for projects, slug generation, rich case study fields, and draft/published/archived lifecycle controls.
-- **CV Manager**: Upload replacement PDF resumes, set public filenames, preview live, and toggle public availability.
-- **Contact Inbox & Lead Pipeline**: Triage inquiries, advance leads through deal stages (`Lead` → `Qualified` → `Proposal` → `Won`), record estimated values, and **Export CSV**.
-- **GitHub Integration**: Server-side synchronization with the GitHub API, repo caching, and manual refresh controls.
-- **Audit Log**: Immutable audit trail of administrative activities and logins.
+## Important content and deployment notes
 
----
+- No testimonial or CV is automatically seeded. Upload a genuine CV before publishing it, and publish testimonials only after confirming permission.
+- Seeded blog articles are drafts. Review their content and attribution before publishing.
+- Project descriptions avoid invented performance metrics and unverified live/repository links. Update project details in the CMS only when they have been checked.
+- Numeric skill proficiency scores are not shown publicly. Use descriptive levels or scores only when you have a meaningful basis for them.
+- The starter data only seeds tables that are empty. Existing databases are not automatically rewritten when seed code changes. See [the legacy-content cleanup guide](docs/DEPLOYMENT.md#8-review-legacy-seeded-content).
+- There is no hard-coded default administrator password. Configure a unique password through environment secrets or use the interactive bootstrap command.
+- Production email notifications and password resets require working SMTP configuration. If SMTP is missing, the backend will not print message bodies or reset links into production logs.
+- Uploaded files need persistent storage or object storage in deployment. Local container filesystems may be ephemeral.
+- The source review environment could not complete `npm ci` because the package registry was unreachable; rerun the frontend production build after dependencies are installed.
 
-## Repository Structure
+## Repository structure
 
-```
-Portfolio/
-├── backend/
-│   ├── app/
-│   │   ├── api/v1/          # REST API endpoints (auth, public, admin modules)
-│   │   ├── cli/             # CLI tools (bootstrap_admin, seed_data)
-│   │   ├── core/            # Config, database engine, Argon2id security, middleware
-│   │   ├── models/          # 14+ SQLAlchemy 2.0 relational models
-│   │   ├── schemas/         # Strict Pydantic v2 validation contracts
-│   │   ├── services/        # Business logic (analytics, email, github, audit)
-│   │   └── main.py          # FastAPI application initialization
-│   ├── migrations/          # Alembic versioned migrations
-│   ├── tests/               # 22 automated Pytest security & CRUD tests
-│   ├── Dockerfile
-│   └── requirements.txt
-├── frontend/
-│   ├── app/                 # Next.js 14 App Router (public pages + /admin CMS)
-│   ├── components/          # Reusable UI components (Hero, Navbar, Projects, Skills, etc.)
-│   ├── lib/                 # Typed API client and analytics helpers
-│   ├── Dockerfile
-│   └── package.json
-├── docs/
-│   ├── DEPLOYMENT.md        # Vercel & Render step-by-step setup
-│   ├── ADMIN_GUIDE.md       # Complete CMS user manual
-│   ├── SECURITY.md          # Threat model & KDPA 2019 compliance
-│   └── API_DOCUMENTATION.md # OpenAPI contract
-├── .github/workflows/ci.yml # Automated CI pipeline
-├── docker-compose.yml       # Local multi-container full-stack execution
-└── README.md
+```text
+backend/
+  app/
+    api/v1/endpoints/    FastAPI public and admin endpoints
+    cli/                 Seed, administrator bootstrap, and legacy cleanup commands
+    core/                Settings, database, security, and middleware
+    models/              SQLAlchemy models
+    schemas/             Pydantic request/response schemas
+    services/             Authentication, email, analytics, audit, and GitHub services
+  tests/                 Pytest suite
+  migrations/            Alembic configuration
+  Dockerfile
+
+frontend/
+  app/                   Public pages and admin CMS pages
+  components/             Reusable UI components
+  lib/                    API client and analytics helper
+  Dockerfile
+
+docs/                     Deployment, security, API, and admin guides
+.github/workflows/ci.yml  Backend tests and frontend build
+docker-compose.yml        Local PostgreSQL + API + frontend
 ```
 
----
+## Local backend setup
 
-## Quickstart & Local Setup
+Use Python 3.11 or later.
 
-### 1. Prerequisites
-- Python 3.11+
-- Node.js 18+ & npm
-- (Optional) Docker & Docker Compose
-
-### 2. Local Backend Run
 ```bash
 cd backend
-python -m venv venv
-# On Windows:
-.\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
+python -m venv .venv
+
+# Windows Git Bash:
+source .venv/Scripts/activate
+
+# Linux/macOS:
+# source .venv/bin/activate
 
 pip install -r requirements.txt
 cp .env.example .env
+```
 
-# Run FastAPI with auto-reload (defaults cleanly to SQLite for zero-config local run)
+Edit `backend/.env` and set a unique local `ADMIN_BOOTSTRAP_PASSWORD` (at least 14 characters), `SESSION_SECRET`, and `PASSWORD_RESET_SECRET`. For local development, the values in `.env.example` are placeholders and should be replaced.
+
+Start the API:
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
-- Swagger API Docs: `http://localhost:8000/docs`
-- Health Probe: `http://localhost:8000/health`
 
-### 3. Local Frontend Run
+- API: `http://localhost:8000`
+- Health: `http://localhost:8000/health`
+- Readiness: `http://localhost:8000/ready`
+- API docs are enabled when `DEBUG=True`: `http://localhost:8000/docs`
+
+If no administrator has been created, bootstrap one interactively from `backend`:
+
+```bash
+python -m app.cli.bootstrap_admin
+```
+
+The password is prompted securely and is not echoed.
+
+## Local frontend setup
+
+In another terminal:
+
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
-- Public Portfolio: `http://localhost:3000`
-- Admin CMS: `http://localhost:3000/admin/login`
 
-### 4. Running Full Stack via Docker Compose
-To run PostgreSQL, FastAPI, and Next.js together:
+Open `http://localhost:3000`. The default API base is `http://localhost:8000/api/v1`; set `NEXT_PUBLIC_API_BASE_URL` when using a different API origin.
+
+Useful commands:
+
 ```bash
-docker-compose up --build
-```
-
----
-
-## Automated Test Verification
-
-Execute the backend test suite covering authentication, session revocation, public content isolation, CSRF/security headers, CRUD operations, and analytics:
-```bash
-python -m pytest backend/tests -v
-```
-*(All 22 automated test suites pass with 100% success rate).*
-
-Execute frontend static page generation and typechecking:
-```bash
-cd frontend
+npm run typecheck
 npm run build
+npm start
 ```
-*(All 22 Next.js static pages, dynamic slugs, sitemap, and robots.txt compile successfully).*
 
----
+The `lint` script currently aliases the TypeScript check; ESLint rules are not configured in this repository yet.
 
-## Default Initial Administrator Credentials
+## Docker Compose
 
-*Seeded upon first database initialization:*
-- **Email**: `admin@florante.tech`
-- **Password**: `AdminPass2026!`
-*(Note: Change your password immediately in `/admin/settings` after initial login).*
+From the repository root:
 
----
+```bash
+cp .env.example .env
+```
 
-## License & Credits
+Edit `.env` to replace the local database and secret values, then run:
 
-Architected and developed by **Oduor Daivine Oluoch** / Florante Tech Limited. Licensed under the MIT License.
+```bash
+docker compose up --build
+```
+
+The example intentionally does not create an administrator. After the services start, run:
+
+```bash
+docker compose exec backend python -m app.cli.bootstrap_admin
+```
+
+Local URLs:
+- Frontend: `http://localhost:3000`
+- API: `http://localhost:8000`
+
+## Tests and verification
+
+Run the backend suite from the repository root:
+
+```bash
+python -m pytest backend/tests -q
+```
+
+The source review run completed **31 backend tests successfully**. Python compilation and lightweight JavaScript/configuration syntax checks also passed. The frontend production build was not re-run because `npm ci` could not download a package from the npm registry in the review environment; rerun it locally or in CI before deployment.
+
+## Deployment
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for Render/Vercel configuration, required environment variables, persistent storage considerations, and the safe legacy-content cleanup procedure.
+
+Do not commit `.env` files, database files, uploads, or production secrets.
+# New_portfolio--website

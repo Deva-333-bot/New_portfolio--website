@@ -14,8 +14,6 @@ class LoginRequest(BaseModel):
     remember_me: bool = False
 
 class LoginResponse(BaseModel):
-    token: str
-    token_type: str = "Bearer"
     expires_at: datetime
     user: "UserResponse"
 
@@ -28,14 +26,14 @@ class UserResponse(SchemaBase):
 
 class PasswordChangeRequest(BaseModel):
     current_password: str
-    new_password: str = Field(..., min_length=8)
+    new_password: str = Field(..., min_length=14)
 
 class PasswordForgotRequest(BaseModel):
     email: EmailStr
 
 class PasswordResetRequest(BaseModel):
     token: str
-    new_password: str = Field(..., min_length=8)
+    new_password: str = Field(..., min_length=14)
 
 # --- Profile & Social Links ---
 class ProfileResponse(SchemaBase):
@@ -337,7 +335,7 @@ class ContactSubmitRequest(BaseModel):
     message: str = Field(..., min_length=10, max_length=5000)
     budget_range: Optional[str] = None
     timeline: Optional[str] = None
-    consent: bool = True
+    consent: bool = False
     honeypot: Optional[str] = None  # Anti-spam: must remain empty
 
 class ContactSubmitResponse(BaseModel):
@@ -416,7 +414,7 @@ class AnalyticsEventCreate(BaseModel):
     content_id: Optional[str] = None
     session_reference: Optional[str] = None
     referrer_domain: Optional[str] = None
-    consent_state: str = "granted"
+    consent_state: str = "unspecified"
 
 class AnalyticsOverviewResponse(BaseModel):
     total_page_views: int

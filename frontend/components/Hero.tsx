@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Download, Terminal } from "lucide-react";
+import { ArrowUpRight, Terminal } from "lucide-react";
 import { logEvent } from "../lib/analytics";
 
 interface HeroProps {
@@ -15,20 +15,19 @@ interface HeroProps {
 
 export default function Hero({ profile }: HeroProps) {
   const name = profile?.display_name || "Oduor Daivine";
-  const headline = profile?.headline || "Founder & Software Engineer";
+  const headline = profile?.headline || "Software Engineering Student | AI & ML Enthusiast | Founder";
   const bio = profile?.short_bio || "I build secure, intelligent software and digital systems for real-world impact with modern technologies.";
 
   const techBadges = [
-    { label: "HTML5", bg: "bg-orange-600/20 text-orange-400 border-orange-500/30" },
-    { label: "CSS3", bg: "bg-blue-600/20 text-blue-400 border-blue-500/30" },
+    { label: "Python", bg: "bg-blue-600/20 text-yellow-300 border-blue-500/30" },
     { label: "JavaScript", bg: "bg-yellow-600/20 text-yellow-400 border-yellow-500/30" },
-    { label: "TypeScript", bg: "bg-sky-600/20 text-sky-400 border-sky-500/30" },
     { label: "React", bg: "bg-cyan-600/20 text-cyan-400 border-cyan-500/30" },
     { label: "FastAPI", bg: "bg-emerald-600/20 text-emerald-400 border-emerald-500/30" },
-    { label: "Python", bg: "bg-blue-600/20 text-yellow-300 border-blue-500/30" },
-    { label: "Git", bg: "bg-red-600/20 text-red-400 border-red-500/30" },
+    { label: "Django", bg: "bg-green-600/20 text-green-400 border-green-500/30" },
+    { label: "PostgreSQL", bg: "bg-sky-600/20 text-sky-400 border-sky-500/30" },
+    { label: "Git & GitHub", bg: "bg-red-600/20 text-red-400 border-red-500/30" },
+    { label: "Java", bg: "bg-orange-600/20 text-orange-400 border-orange-500/30" },
   ];
-
   return (
     <section id="home" className="relative pt-12 pb-24 md:py-24 overflow-hidden">
       {/* Background radial glow */}
@@ -71,16 +70,7 @@ export default function Hero({ profile }: HeroProps) {
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
 
-              <a
-                href={`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1"}/public/cv`}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => logEvent("cv_download", { contentId: "hero_download_cv" })}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-navy-700/80 hover:bg-navy-700 border border-navy-600 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm shadow-md transition-all"
-              >
-                <span>Download CV</span>
-                <Download className="w-4 h-4 text-slate-400" />
-              </a>
+
             </div>
 
             {/* Technologies Badges */}
@@ -141,7 +131,7 @@ export default function Hero({ profile }: HeroProps) {
                   {"\n"}  <span className="text-slate-400">name:</span>{" "}
                   <span className="text-emerald-400">&quot;{name}&quot;</span>,
                   {"\n"}  <span className="text-slate-400">role:</span>{" "}
-                  <span className="text-emerald-400">&quot;Founder & Engineer&quot;</span>,
+                  <span className="text-emerald-400">&quot;Software Engineering Student &amp; Founder&quot;</span>,
                   {"\n"}  <span className="text-slate-400">skills:</span> [
                   <span className="text-amber-300">&quot;Python&quot;</span>,{" "}
                   <span className="text-amber-300">&quot;FastAPI&quot;</span>,{" "}

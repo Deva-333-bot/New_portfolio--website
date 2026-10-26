@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import time
 from typing import Tuple, Optional
+from datetime import datetime, timezone
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError
 from app.core.config import settings
@@ -45,10 +46,19 @@ def hash_token(raw_token: str) -> str:
     """Computes a SHA-256 hash of a session or reset token."""
     return hashlib.sha256(f"{raw_token}:{settings.SESSION_SECRET}".encode("utf-8")).hexdigest()
 
-def generate_reset_token(email: str) -> str:
-    """Generates a secure signed password reset token with 1-hour expiration."""
+def _password_version(updated_at: Optional[datetime]) -> str:
+    if updated_at is None:
+        return "0"
+    if updated_at.tzinfo is None:
+        updated_at = updated_at.replace(tzinfo=timezone.utc)
+    return str(int(updated_at.timestamp() * 1_000_000))
+
+
+def generate_reset_token(email: str, password_updated_at: Optional[datetime] = None) -> str:
+    """Create a one-hour reset token invalidated by a subsequent password change."""
     expires_at = int(time.time()) + 3600
-    payload = f"{email}:{expires_at}"
+    version = _password_version(password_updated_at)
+    payload = f"{email}:{expires_at}:{version}"
     signature = hmac.new(
         settings.PASSWORD_RESET_SECRET.encode("utf-8"),
         payload.encode("utf-8"),
@@ -56,27 +66,33 @@ def generate_reset_token(email: str) -> str:
     ).hexdigest()
     return f"{payload}:{signature}"
 
-def verify_reset_token(token: str) -> Optional[str]:
-    """Verifies the password reset token and returns the email if valid."""
-    parts = token.split(":")
-    if len(parts) != 3:
+
+def verify_reset_token(
+    token: str,
+    current_password_updated_at: Optional[datetime] = None,
+) -> Optional[str]:
+    """Verify expiry/signature and optionally bind the token to the current password version."""
+    parts = token.split(":", 3)
+    if len(parts) != 4:
         return None
-    email, expires_at_str, signature = parts
+    email, expires_at_str, version, signature = parts
     try:
         expires_at = int(expires_at_str)
     except ValueError:
         return None
 
     if time.time() > expires_at:
-        return None  # Expired
+        return None
 
-    expected_payload = f"{email}:{expires_at}"
+    expected_payload = f"{email}:{expires_at}:{version}"
     expected_sig = hmac.new(
         settings.PASSWORD_RESET_SECRET.encode("utf-8"),
         expected_payload.encode("utf-8"),
         hashlib.sha256
     ).hexdigest()
 
-    if secrets.compare_digest(signature, expected_sig):
-        return email
-    return None
+    if not secrets.compare_digest(signature, expected_sig):
+        return None
+    if current_password_updated_at is not None and version != _password_version(current_password_updated_at):
+        return None
+    return email

@@ -54,10 +54,10 @@ class Profile(Base):
     company_name = Column(String(150), nullable=True)
     education_summary = Column(String(255), nullable=True)
     expected_graduation = Column(String(50), nullable=True)
-    years_experience = Column(String(50), default="4+")
-    projects_completed = Column(String(50), default="15+")
-    happy_clients = Column(String(50), default="10+")
-    client_satisfaction = Column(String(50), default="100%")
+    years_experience = Column(String(50), default="")
+    projects_completed = Column(String(50), default="")
+    happy_clients = Column(String(50), default="")
+    client_satisfaction = Column(String(50), default="")
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
 class SocialLink(Base):

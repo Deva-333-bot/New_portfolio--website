@@ -18,8 +18,6 @@ The FastAPI backend provides structured, type-safe REST contracts formatted unde
 - **Response** (`200 OK`):
   ```json
   {
-    "token": "48_byte_urlsafe_token",
-    "token_type": "Bearer",
     "expires_at": "2026-10-27T00:00:00Z",
     "user": {
       "id": "uuid",
@@ -29,7 +27,7 @@ The FastAPI backend provides structured, type-safe REST contracts formatted unde
     }
   }
   ```
-- **Side Effect**: Sets `portfolio_session` HttpOnly cookie.
+- **Side Effect**: Sets the `portfolio_session` HttpOnly cookie. The response body intentionally does not expose the raw session token.
 
 ### `POST /api/v1/auth/logout`
 - **Headers / Cookie**: Requires valid session.
@@ -49,7 +47,7 @@ The FastAPI backend provides structured, type-safe REST contracts formatted unde
 
 | Method | Path | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/public/profile` | Returns verified public profile and visible social links. |
+| `GET` | `/api/v1/public/profile` | Returns the configured public profile and visible social links. |
 | `GET` | `/api/v1/public/skills` | Returns visible skills grouped by category. |
 | `GET` | `/api/v1/public/projects` | Returns list of published projects. Supports `?category=Backend`. |
 | `GET` | `/api/v1/public/projects/{slug}` | Returns detailed case study (problem, solution, architecture, outcomes). |

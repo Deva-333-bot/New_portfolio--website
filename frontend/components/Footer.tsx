@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Github, Linkedin, Twitter, Mail, Quote } from "lucide-react";
+import { ArrowUpRight, Github, Mail } from "lucide-react";
 
 interface FooterProps {
   displayName?: string;
@@ -18,8 +18,8 @@ export default function Footer({
     <footer className="bg-navy-900 border-t border-navy-600/50 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* 3-Column Grid directly matching reference visual */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-navy-600/40">
+       {/* Two-column footer: contact and social links */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-12 border-b border-navy-600/40">
           
           {/* Column 1: Let's Work Together */}
           <div className="space-y-4">
@@ -43,24 +43,7 @@ export default function Footer({
             </div>
           </div>
 
-          {/* Column 2: Testimonial Quote Card matching reference visual */}
-          <div className="bg-navy-800/80 border border-navy-600/60 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="space-y-3">
-              <Quote className="w-7 h-7 text-brand-400/60" />
-              <p className="text-xs sm:text-sm text-slate-300 italic leading-relaxed">
-                &ldquo;Alex is an exceptional developer who delivers high-quality work on time. His attention to detail and problem-solving skills are outstanding.&rdquo;
-              </p>
-            </div>
-            <div className="flex items-center gap-3 pt-4 mt-2 border-t border-navy-600/40">
-              <div className="w-9 h-9 rounded-full bg-brand-600/20 border border-brand-500/40 flex items-center justify-center text-brand-300 font-bold text-xs">
-                SJ
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">Sarah Johnson</p>
-                <p className="text-[11px] text-slate-400">CEO, TechStart</p>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Column 3: Follow Me & Contact Links */}
           <div className="space-y-4">
@@ -69,31 +52,13 @@ export default function Footer({
             </span>
             <div className="flex items-center gap-3">
               <a
-                href="https://github.com/florantetech"
+                href="https://github.com/Deva-333-bot"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub"
                 className="w-9 h-9 rounded-lg bg-navy-800 hover:bg-navy-700 border border-navy-600 hover:border-brand-500 flex items-center justify-center text-slate-300 hover:text-white transition-all"
               >
                 <Github className="w-4 h-4" />
-              </a>
-              <a
-                href="https://linkedin.com/in/oduor-daivine"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="w-9 h-9 rounded-lg bg-navy-800 hover:bg-navy-700 border border-navy-600 hover:border-brand-500 flex items-center justify-center text-slate-300 hover:text-white transition-all"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a
-                href="https://x.com/florantetech"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Twitter / X"
-                className="w-9 h-9 rounded-lg bg-navy-800 hover:bg-navy-700 border border-navy-600 hover:border-brand-500 flex items-center justify-center text-slate-300 hover:text-white transition-all"
-              >
-                <Twitter className="w-4 h-4" />
               </a>
             </div>
 
@@ -105,7 +70,7 @@ export default function Footer({
                 </a>
               </p>
               <p className="text-slate-500 font-mono">
-                Kenya &bull; Kirinyaga &bull; Nairobi
+                Kenya
               </p>
             </div>
           </div>
@@ -121,6 +86,14 @@ export default function Footer({
             <Link href="/privacy" className="hover:text-slate-300 transition-colors">
               Privacy Policy
             </Link>
+            <span>&bull;</span>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("open-analytics-preferences"))}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Manage Analytics
+            </button>
             <span>&bull;</span>
             <Link href="/admin/login" className="hover:text-slate-300 transition-colors">
               Admin Portal

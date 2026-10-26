@@ -22,7 +22,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-sm text-slate-400">
-            Last Updated: October 2026 &bull; Compliant with Kenya Data Protection Act, 2019
+            Last Updated: October 2026 &bull; Privacy notice for users in Kenya and elsewhere
           </p>
         </div>
 
@@ -37,21 +37,21 @@ export default function PrivacyPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-white">2. First-Party Analytics</h2>
             <p>
-              Our website uses privacy-conscious, first-party telemetry solely to measure aggregate site performance, popular case studies, and CV downloads. Telemetry sessions are pseudonymized using salted daily hashes. We do not use persistent cross-site tracking cookies or fingerprinting.
+              Optional first-party analytics run only after you select “Accept analytics” in the site banner. Events include page views, project interactions, and CV-download clicks so the owner can review aggregate usage. You may decline and still use the website. Your choice is stored in this browser's local storage and can be changed using “Manage Analytics” in the footer. The server derives a truncated, daily keyed pseudonymous reference from the request IP address; it does not store the raw IP address in the analytics event. This is pseudonymization, not a guarantee of anonymity. The site does not use persistent cross-site tracking cookies or browser fingerprinting.
             </p>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-white">3. Contact Form Submissions</h2>
             <p>
-              When you submit an inquiry through our contact form, we collect your name, email address, organization (if supplied), and message content strictly for the purpose of communicating with you regarding your inquiry.
+              When you submit an inquiry through our contact form, we store your name, email address, organization (if supplied), inquiry details, and message in the website database so the owner can respond and manage the inquiry. If production email delivery is configured, a notification may also be sent to the site owner. Contact submissions are retained in the CMS until deleted; no automatic retention period is currently configured.
             </p>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-white">4. Data Retention & Your Rights</h2>
             <p>
-              In accordance with the Kenya Data Protection Act, 2019, you have the right to request access to, rectification of, or erasure of any personal records you have submitted. To exercise these rights, please email us directly at <span className="text-brand-400 font-mono">hello@florante.tech</span>.
+              You may request access to, correction of, or deletion of personal information you submitted, subject to applicable law. To make a request, please email <span className="text-brand-400 font-mono">hello@florante.tech</span>.
             </p>
           </section>
         </div>

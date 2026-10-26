@@ -34,16 +34,15 @@ async function getInitialData() {
     return {
       profile: {
         display_name: "Oduor Daivine Oluoch",
-        headline: "Founder, Software Engineer & Technology Innovator",
+        headline: "Software Engineering Student | AI & ML Enthusiast | Founder",
         short_bio: "Building secure, intelligent software and resilient digital systems for real-world impact across Africa and beyond.",
         full_bio: "Software engineer and founder of Florante Tech Limited, pursuing BSc Software Engineering at Kirinyaga University (expected 2028). Specializing in FastAPI backend architecture, scalable web apps, and applied AI systems.",
         company_name: "Florante Tech Limited",
         location: "Nairobi / Kirinyaga, Kenya",
         public_email: "hello@florante.tech",
-        years_experience: "4+",
-        projects_completed: "15+",
-        happy_clients: "10+",
-        client_satisfaction: "100%",
+         
+        
+        
       },
       skills: [],
       projects: [],
@@ -57,7 +56,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar brandName="CodeCraft" />
+      <Navbar brandName="Daivine Oluoch" />
       <main className="flex-1">
         <Hero profile={data.profile} />
         <About profile={data.profile} />

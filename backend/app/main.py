@@ -17,14 +17,11 @@ os.makedirs(os.path.join(settings.LOCAL_STORAGE_DIR, "cv"), exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: ensure tables created & seed initial verified content if empty
+    # Startup: ensure tables exist and insert starter content only into empty tables
     Base.metadata.create_all(bind=engine)
-    try:
-        from app.core.database import SessionLocal
-        with SessionLocal() as db:
-            seed_initial_database(db)
-    except Exception as e:
-        print(f"Startup database seeding note: {e}")
+    from app.core.database import SessionLocal
+    with SessionLocal() as db:
+        seed_initial_database(db)
     yield
     # Shutdown
 
@@ -51,14 +48,17 @@ app.add_middleware(
 )
 
 # Static file serving for uploads
-app.mount("/uploads", StaticFiles(directory=settings.LOCAL_STORAGE_DIR), name="uploads")
+app.mount(
+    "/uploads/media",
+    StaticFiles(directory=os.path.join(settings.LOCAL_STORAGE_DIR, "media")),
+    name="public-media",
+)
 
 # Health and readiness check endpoints
 @app.get("/health", tags=["Operations"])
 def health_check():
     return {
         "status": "healthy",
-        "environment": settings.APP_ENV,
         "version": "1.0.0"
     }
 
@@ -66,15 +66,13 @@ def health_check():
 def readiness_check(db: Session = Depends(get_db)):
     try:
         db.execute(text("SELECT 1"))
-        return {
-            "status": "ready",
-            "database": "connected"
-        }
-    except Exception as e:
-        return {
-            "status": "unavailable",
-            "database": "disconnected"
-        }
+        return {"status": "ready", "database": "connected"}
+    except Exception:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "unavailable", "database": "disconnected"}
+        )
 
 # Mount v1 API
 app.include_router(api_v1_router)

@@ -22,11 +22,12 @@ export default function AdminProfileManager() {
     expected_graduation: "",
     location: "",
     availability_status: "",
-    public_email: "",
-    years_experience: "4+",
-    projects_completed: "15+",
-    happy_clients: "10+",
-    client_satisfaction: "100%",
+    public_email: "", 
+    years_experience: "",
+    projects_completed: "",
+    happy_clients: "",
+    client_satisfaction: "",
+
   });
 
   const [socialLinks, setSocialLinks] = useState<any[]>([]);

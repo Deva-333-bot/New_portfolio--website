@@ -40,10 +40,17 @@ yarn-error.log*
 
 # Environment & Secrets
 .env
+.envc
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.development
+.env.production
+.env.*.local
+.env.*
+!.env.example
+backend/.env*
+!backend/.env.example
+frontend/.env*
+!frontend/.env.example
 
 # Uploads
 backend/uploads/media/*
@@ -58,3 +65,9 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Local Python virtual environments
+backend/.venv/
+
+# TypeScript build cache
+*.tsbuildinfo

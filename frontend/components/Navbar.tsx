@@ -9,7 +9,7 @@ interface NavbarProps {
   brandName?: string;
 }
 
-export default function Navbar({ brandName = "CodeCraft" }: NavbarProps) {
+export default function Navbar({ brandName = "Daivine Oluoch" }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinks = [

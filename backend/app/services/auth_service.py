@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import hash_token
 from app.models.all_models import AdminSession, AdminUser
+from app.core.config import settings
 
 def get_current_admin(
     request: Request,
@@ -13,6 +14,16 @@ def get_current_admin(
     Extracts session token from HttpOnly cookie or Authorization header,
     validates the hash in the database, checks expiration and revocation.
     """
+    # Defense in depth against cross-site requests when auth uses cookies.
+    if request.method not in {"GET", "HEAD", "OPTIONS"}:
+        origin = request.headers.get("origin")
+        allowed_origins = {item.rstrip("/") for item in settings.cors_origins}
+        if origin and origin.rstrip("/") not in allowed_origins:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Request origin is not allowed."
+            )
+
     token = None
     # 1. Check HttpOnly cookie
     if "portfolio_session" in request.cookies:

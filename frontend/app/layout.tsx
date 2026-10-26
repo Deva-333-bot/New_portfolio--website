@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientAnalyticsTracker from "./ClientAnalyticsTracker";
+import AnalyticsConsentBanner from "../components/AnalyticsConsentBanner";
 
 export const metadata: Metadata = {
-  title: "Oduor Daivine Oluoch | Founder, Software Engineer & Technology Innovator",
-  description: "Official portfolio of Oduor Daivine Oluoch. Founder of Florante Tech Limited, software engineer specializing in FastAPI backend architecture, scalable web apps, and applied AI systems.",
+  title: "Oduor Daivine Oluoch | Software Engineering Student, AI & ML Enthusiast",
+  description: "Portfolio of Oduor Daivine Oluoch, software engineering student, AI and machine-learning enthusiast, and founder of Florante Tech Limited.",
   keywords: ["Software Engineer", "Kenya", "FastAPI", "Python", "React", "Next.js", "Florante Tech", "Cybersecurity", "Oduor Daivine"],
   authors: [{ name: "Oduor Daivine Oluoch" }],
   openGraph: {
-    title: "Oduor Daivine Oluoch | Founder & Software Engineer",
+    title: "Oduor Daivine Oluoch | Software Engineering Student & Founder",
     description: "Building Secure, Intelligent Software for Real-World Problems.",
     type: "website",
     locale: "en_US",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Oduor Daivine Oluoch | Founder & Software Engineer",
+    title: "Oduor Daivine Oluoch | Software Engineering Student & Founder",
     description: "Building Secure, Intelligent Software for Real-World Problems.",
   },
   robots: {
@@ -34,21 +35,14 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "Oduor Daivine Oluoch",
-    "jobTitle": "Founder & Software Engineer",
+    "jobTitle": "Software Engineering Student and Founder",
     "worksFor": {
       "@type": "Organization",
       "name": "Florante Tech Limited"
     },
-    "alumniOf": {
-      "@type": "CollegeOrUniversity",
-      "name": "Kirinyaga University"
-    },
+
     "url": "https://florante.tech",
-    "sameAs": [
-      "https://github.com/florantetech",
-      "https://linkedin.com/in/oduor-daivine",
-      "https://x.com/florantetech"
-    ]
+    "sameAs": ["https://github.com/Deva-333-bot"]
   };
 
   return (
@@ -61,6 +55,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-navy-900 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
         <ClientAnalyticsTracker />
+        <AnalyticsConsentBanner />
         {children}
       </body>
     </html>

@@ -19,7 +19,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         
-        if settings.APP_ENV == "production":
+        if settings.APP_ENV.lower() == "production":
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
             
         return response

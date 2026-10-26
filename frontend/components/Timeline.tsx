@@ -5,39 +5,38 @@ import { GraduationCap, Briefcase, Award, Rocket } from "lucide-react";
 export default function Timeline() {
   const items = [
     {
-      period: "2024 - Present",
-      title: "Founder & Lead Software Engineer",
+      period: "Current",
+      title: "Founder",
       organization: "Florante Tech Limited",
-      description: "Directing software architecture, client consulting, and full-stack product incubation across AI, SaaS, and cybersecurity.",
+      description: "Building an AI-focused technology startup and exploring practical software, automation, and digital solutions.",
       icon: Rocket,
-      badge: "Founder",
+      badge: "Entrepreneurship",
     },
     {
-      period: "2024 - 2028 (Expected)",
+      period: "Expected 2028",
       title: "BSc in Software Engineering",
       organization: "Kirinyaga University, Kenya",
-      description: "Rigorous academic curriculum covering algorithms, operating systems, distributed architectures, database engineering, and discrete mathematics.",
+      description: "Studying software engineering while developing practical skills in backend development, web applications, and machine learning.",
       icon: GraduationCap,
       badge: "Education",
     },
     {
-      period: "2022 - Present",
-      title: "Backend & Systems Software Developer",
-      organization: "Independent & Open Source",
-      description: "Designing REST microservices with FastAPI and PostgreSQL, building data science ML pipelines, and authoring technical documentation.",
+      period: "May – August 2026",
+      title: "Internship",
+      organization: "Safaricom",
+      description: "Completed an internship at Safaricom during May–August 2026.",
       icon: Briefcase,
-      badge: "Engineering",
+      badge: "Internship",
     },
     {
-      period: "2023 - Present",
-      title: "Cybersecurity & Systems Research",
-      organization: "Florante Research",
-      description: "Exploring cryptographic verification systems, zero-knowledge proofs, and secure authentication models for low-bandwidth African networks.",
+      period: "Project work",
+      title: "Software & Machine Learning Projects",
+      organization: "Academic and personal development",
+      description: "Projects include a portfolio CMS, a hotel-management prototype, and exploratory sales forecasting with Python and TensorFlow.",
       icon: Award,
-      badge: "Research",
+      badge: "Projects",
     },
   ];
-
   return (
     <section id="experience" className="py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,7 +50,7 @@ export default function Timeline() {
             Experience & Education
           </h2>
           <p className="text-slate-400 text-sm sm:text-base">
-            Verified academic milestones, leadership roles, and engineering initiatives.
+            Education, internship experience, and project work.
           </p>
         </div>
 

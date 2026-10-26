@@ -1,20 +1,17 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:16-alpine
-    container_name: portfolio_db
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: portfolio_user
-      POSTGRES_PASSWORD: secure_portfolio_password_2026
-      POSTGRES_DB: portfolio_db
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in root .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in root .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in root .env}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,24 +20,24 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: portfolio_backend
-    restart: always
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
-      APP_ENV: production
-      DEBUG: "False"
-      DATABASE_URL: postgresql+psycopg2://portfolio_user:secure_portfolio_password_2026@db:5432/portfolio_db
+      APP_ENV: development
+      DEBUG: "True"
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       CANONICAL_SITE_URL: http://localhost:3000
       API_BASE_URL: http://localhost:8000
-      SESSION_SECRET: enterprise_random_64_character_session_secret_for_production
-      PASSWORD_RESET_SECRET: enterprise_random_64_character_password_reset_secret
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in root .env}
+      PASSWORD_RESET_SECRET: ${PASSWORD_RESET_SECRET:?Set PASSWORD_RESET_SECRET in root .env}
       FRONTEND_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
-      ADMIN_BOOTSTRAP_EMAIL: admin@florante.tech
-      ADMIN_BOOTSTRAP_PASSWORD: ProductionPassword2026!
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-admin@florante.tech}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-REPLACE_WITH_A_UNIQUE_LOCAL_PASSWORD}
       EMAIL_PROVIDER: console
-      EMAIL_FROM_ADDRESS: hello@florante.tech
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-hello@florante.tech}
+      LOCAL_STORAGE_DIR: /app/uploads
     ports:
       - "8000:8000"
     volumes:
@@ -50,8 +47,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: portfolio_frontend
-    restart: always
+      args:
+        NEXT_PUBLIC_SITE_URL: http://localhost:3000
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+    restart: unless-stopped
     depends_on:
       - backend
     environment:

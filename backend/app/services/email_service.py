@@ -10,7 +10,14 @@ def send_notification_email(subject: str, body_text: str, to_address: str = None
     recipient = to_address or settings.EMAIL_FROM_ADDRESS
     sender = settings.EMAIL_FROM_ADDRESS
 
-    if settings.EMAIL_PROVIDER == "console" or not settings.SMTP_HOST:
+    if settings.APP_ENV.lower() == "production" and (
+        settings.EMAIL_PROVIDER.lower() == "console" or not settings.SMTP_HOST
+    ):
+        # Never write personal inquiry contents or reset links into production logs.
+        print("Email delivery skipped: configure SMTP to enable production notifications.")
+        return False
+
+    if settings.EMAIL_PROVIDER.lower() == "console" or not settings.SMTP_HOST:
         print("\n================== EMAIL NOTIFICATION [CONSOLE] ==================")
         print(f"From: {sender}")
         print(f"To: {recipient}")

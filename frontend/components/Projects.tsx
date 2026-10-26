@@ -56,7 +56,7 @@ export default function Projects({ initialProjects }: { initialProjects?: Projec
             Some of My Recent Work
           </h2>
           <p className="text-slate-400 text-sm sm:text-base">
-            Architected for reliability, security, and measurable performance.
+            A selection of projects exploring web development, backend systems, and machine learning.
           </p>
 
           {/* Category Filter Tabs */}

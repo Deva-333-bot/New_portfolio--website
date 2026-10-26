@@ -1,4 +1,10 @@
 import os
+from contextlib import asynccontextmanager
+
+# Deterministic, test-only settings; never depend on a developer's local .env.
+os.environ["APP_ENV"] = "testing"
+os.environ["ADMIN_BOOTSTRAP_PASSWORD"] = "TestOnly-Portfolio-Passphrase-2026!"
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -13,6 +19,13 @@ from app.core.config import settings
 from app.main import app
 from app.cli.seed_data import seed_initial_database
 from app.core.middleware import rate_limiter
+
+# Prevent application startup from opening/seeding the developer's real database.
+@asynccontextmanager
+async def test_lifespan(_app):
+    yield
+
+app.router.lifespan_context = test_lifespan
 
 # Use in-memory SQLite database for tests
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -65,5 +78,5 @@ def auth_headers(client):
         "password": settings.ADMIN_BOOTSTRAP_PASSWORD
     })
     assert response.status_code == 200, f"Login failed: {response.text}"
-    token = response.json()["token"]
-    return {"Authorization": f"Bearer {token}"}
+    # TestClient keeps the HttpOnly session cookie for subsequent requests.
+    return {}

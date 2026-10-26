@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
 import { adminLogin } from "../../../lib/api";
 
@@ -25,9 +26,6 @@ export default function AdminLoginPage() {
         remember_me: rememberMe,
       });
 
-      if (data.token) {
-        localStorage.setItem("portfolio_admin_token", data.token);
-      }
       router.push("/admin/overview");
     } catch (err: any) {
       setError(err.message || "Invalid credentials. Please verify your email and password.");
@@ -123,6 +121,11 @@ export default function AdminLoginPage() {
               </>
             )}
           </button>
+          <div className="text-center pt-3">
+            <Link href="/admin/forgot-password" className="text-xs text-brand-300 hover:text-white underline underline-offset-4">
+              Forgot your password?
+            </Link>
+          </div>
         </form>
 
         <div className="mt-8 pt-6 border-t border-navy-600/50 flex items-center justify-center gap-2 text-xs text-slate-500">

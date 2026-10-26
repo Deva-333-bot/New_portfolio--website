@@ -36,7 +36,7 @@ This guide details the procedure for provisioning, configuring, and deploying th
    - **Runtime**: `Python`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - **Health Check Path**: `/health`
+   - **Health Check Path**: `/ready`
 
 4. Add the required Environment Variables:
    | Variable | Value / Description |
@@ -51,10 +51,10 @@ This guide details the procedure for provisioning, configuring, and deploying th
    | `FRONTEND_ORIGINS` | `https://florante.tech,https://www.florante.tech` |
    | `ADMIN_BOOTSTRAP_EMAIL`| `admin@florante.tech` |
    | `ADMIN_BOOTSTRAP_PASSWORD`| Choose a secure initial 16+ character password |
-   | `EMAIL_PROVIDER` | `console`, `smtp`, `sendgrid`, or `resend` |
+   | `EMAIL_PROVIDER` | `console` or `smtp` |
    | `EMAIL_FROM_ADDRESS` | `hello@florante.tech` |
 
-5. Deploy the service. Verify that `GET https://<render-url>/health` returns `{"status": "healthy"}` and `GET https://<render-url>/ready` returns `{"status": "ready", "database": "connected"}`.
+5. Deploy the service. Verify that `GET https://<render-url>/health` returns `{"status": "healthy"}` and `GET https://<render-url>/ready` returns `{"status": "ready", "database": "connected"}`. Render uses `/ready` so database connectivity is checked during deploys.
 
 ---
 
@@ -78,7 +78,7 @@ This guide details the procedure for provisioning, configuring, and deploying th
 
 ## 5. First-Time Administrator Bootstrap
 
-On the first deployment, database tables are automatically initialized and pre-seeded with verified initial data seeds (Oduor Daivine Oluoch profile, Florante Tech Limited, Kirinyaga University, verified draft projects, and CV document).
+On first startup, the application initializes database tables and adds starter profile, skill, and project records only when those tables are empty. Review all seeded content in the admin CMS before treating it as final. No testimonial or CV document is seeded; upload a real CV and only publish testimonials with permission.
 
 To sign in to the Administrative CMS:
 1. Navigate to `https://<your-frontend-domain>/admin/login`.
@@ -105,3 +105,25 @@ If a migration or backend release causes regressions:
 alembic downgrade -1
 ```
 3. Vercel allows instant 1-click rollback to any previously successful deployment via the **Deployments** tab.
+
+## 7. Persistent Upload Storage
+
+The backend stores uploaded media and CV files under `LOCAL_STORAGE_DIR`. The application now serves only the public media subdirectory as static content; CV files are delivered through the public CV endpoint only when published. A local container filesystem may be ephemeral, so configure a persistent disk or object storage before relying on uploads across deployments/restarts. Do not publish private CVs or documents. Password-reset email is deliberately not emitted to production logs when console email is selected; configure a real SMTP provider before relying on password-reset delivery.
+
+## 8. Review legacy seeded content safely
+
+Changing seed code does not update rows already stored in a database. A maintenance command is provided to identify and unpublish known legacy demo projects/posts, hide testimonials without recorded permission, unpublish the known dummy CV filename, and clear numeric skill scores and the old default profile metrics. It does not delete rows.
+
+From `backend`, run a dry run first:
+
+```bash
+python -m app.cli.sanitize_seed_content
+```
+
+Review the reported counts, confirm the configured `DATABASE_URL` points to the intended database, and only then apply:
+
+```bash
+python -m app.cli.sanitize_seed_content --apply
+```
+
+Back up the database before applying changes. This command intentionally leaves the records in place so they can be reviewed in the admin CMS.

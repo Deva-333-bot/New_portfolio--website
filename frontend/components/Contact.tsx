@@ -15,7 +15,7 @@ export default function Contact({ publicEmail, location }: { publicEmail?: strin
     message: "",
     budget_range: "",
     timeline: "",
-    consent: true,
+    consent: false,
     honeypot: "",
   });
 
@@ -54,7 +54,7 @@ export default function Contact({ publicEmail, location }: { publicEmail?: strin
         message: "",
         budget_range: "",
         timeline: "",
-        consent: true,
+        consent: false,
         honeypot: "",
       });
       logEvent("contact_form_submit", { contentType: "inquiry" });
@@ -94,7 +94,7 @@ export default function Contact({ publicEmail, location }: { publicEmail?: strin
                 Contact Details
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed">
-                Whether you have an inquiry about building an intelligent backend, launching a product, or exploring full-time roles, I respond to all professional messages promptly.
+                Whether you have an inquiry about building an intelligent backend, launching a product, or exploring full-time roles, You can use the form below for professional inquiries.
               </p>
 
               <div className="space-y-4 pt-2">
@@ -126,7 +126,7 @@ export default function Contact({ publicEmail, location }: { publicEmail?: strin
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 font-mono">Location</p>
-                    <p className="text-sm font-semibold text-white">{location || "Nairobi / Kirinyaga, Kenya"}</p>
+                    <p className="text-sm font-semibold text-white">{location || "Kenya"}</p>
                   </div>
                 </div>
               </div>
@@ -287,6 +287,7 @@ export default function Contact({ publicEmail, location }: { publicEmail?: strin
                   type="checkbox"
                   id="consent"
                   checked={formData.consent}
+                  required
                   onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
                   className="rounded bg-navy-900 border-navy-600 text-brand-600 focus:ring-brand-500"
                 />
